@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: flask-todo
+  namespace: argocd
+  annotations:
+    # Docker image to track
+    argocd-image-updater.argoproj.io/image-list: "flask=zahidbilal/flask-argcdimageupdater"
+    # Update strategy (semantic versioning)
+    argocd-image-updater.argoproj.io/flask.update-strategy: "semver"
+    # Allowed tags (only vX.Y.Z)
+    argocd-image-updater.argoproj.io/flask.allow-tags: "regexp:^v?\\d+\\.\\d+\\.\\d+$"
+    # Write-back configuration to Git
+    argocd-image-updater.argoproj.io/write-back-method: git
+    argocd-image-updater.argoproj.io/git-branch: main
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/zahid-IT/zahidbilal-flask-argcdimageupdater.git
+    path: k8s                 # <-- updated to point to manifests folder
+    targetRevision: main
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: flask-todoapp
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+
